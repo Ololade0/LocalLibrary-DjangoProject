@@ -21,6 +21,6 @@ from django.views.generic import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('catalogue/', include('catalogue.urls')),
-    path('', RedirectView.as_view(url='catalog/')),
+    path('', include('catalogue.urls')),
+    path('', RedirectView.as_view(url='catalog')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
