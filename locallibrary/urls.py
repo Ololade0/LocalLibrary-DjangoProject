@@ -20,7 +20,11 @@ from django.urls import path, include
 from django.views.generic import RedirectView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin', admin.site.urls),
     path('', include('catalogue.urls')),
     path('', RedirectView.as_view(url='catalog')),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    path('accounts/', include('django.contrib.auth.urls')),
+
+]
+              # + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT),
+

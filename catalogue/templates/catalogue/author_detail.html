@@ -1,0 +1,28 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Name: {{ author.firstName }}</h1>
+
+  <p><strong>Book:</strong> <a href="">{{ author.book }}</a></p> <!-- author detail link not yet defined -->
+  <p><strong>FirstName:</strong> {{ author.firstName }}</p>
+  <p><strong>SecondName:</strong> {{ author.lastName }}</p>
+      <p><strong>date_of_birth:</strong> {{ author.date_of_birth }}</p>
+  <p><strong>Date_of death:</strong> {{ author.date_of_death }}</p>
+{#  <p><strong>Genre:</strong> {{ book.genre.all|join:", " }}</p>#}
+
+  <div style="margin-left:20px;margin-top:20px">
+    <h4>Author Copies</h4>
+{##}
+    {% for copy in  %}
+{#      <hr>#}
+{#      <p class="{% if copy.status == 'a' %}text-success{% elif copy.status == 'm' %}text-danger{% else %}text-warning{% endif %}">#}
+{#        {{ copy.get_status_display }}#}
+{#      </p>#}
+{#      {% if copy.status != 'a' %}#}
+{#        <p><strong>Due to be returned:</strong> {{ copy.due_back }}</p>#}
+{#      {% endif %}#}
+{#      <p><strong>Imprint:</strong> {{ copy.imprint }}</p>#}
+{#      <p class="text-muted"><strong>Id:</strong> {{ copy.id }}</p>#}
+{#    {% endfor %}#}
+  </div>
+{% endblock %}
