@@ -1,3 +1,5 @@
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.shortcuts import render
 from django.views import generic
@@ -5,8 +7,8 @@ from django.views import generic
 from catalogue.models import Book, BookInstance, Author, Genre
 
 
+@login_required
 def index(request):
-
     num_books = Book.objects.all().count()
     num_instances = BookInstance.objects.all().count()
     num_instances_available = BookInstance.objects.filter(status__exact='a').count()
@@ -23,18 +25,19 @@ def index(request):
         'num_authors': num_authors,
         'num_genres': num_genres,
         'num_genres_available': num_genres_available,
-        'num_visits' : num_visits
+        'num_visits': num_visits
     }
 
     return render(request, 'catalogue/index.html', context=context)
 
 
+# @login_required
 class BookListView(generic.ListView):
     model = Book
     paginate_by = 1
 
     def get_context_data(self, **kwargs):
-        context = super(BookListView, self)\
+        context = super(BookListView, self) \
             .get_context_data(**kwargs)
 
         context['some_data'] = 'This is just some data'
@@ -42,10 +45,12 @@ class BookListView(generic.ListView):
         return context
 
 
+# @login_required
 class BookDetailView(generic.DetailView):
     model = Book
 
 
+# @login_required
 def book_detail_view(request, primary_key):
     try:
         book = Book.objects.get(pk=primary_key)
@@ -54,12 +59,13 @@ def book_detail_view(request, primary_key):
     return render(request, 'catalogue/book_detail.html', context={'book': book})
 
 
+# @login_required
 class AuthorListView(generic.ListView):
     model = Author
     paginate_by = 1
 
     def get_context_data(self, **kwargs):
-        context = super(AuthorListView, self)\
+        context = super(AuthorListView, self) \
             .get_context_data(**kwargs)
 
         context['some_data'] = 'This is just some data'
@@ -67,6 +73,7 @@ class AuthorListView(generic.ListView):
         return context
 
 
+@login_required
 def author_detail_view(request, primary_key):
     try:
         author = Author.objects.get(pk=primary_key)
@@ -74,3 +81,13 @@ def author_detail_view(request, primary_key):
         raise Http404('Author does not exist')
     return render(request, 'catalogue/author_detail.html', context={'author': author})
 
+
+
+class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
+    """Generic class-based view listing books on loan to current user."""
+    model = BookInstance
+    template_name = 'catalogue/bookinstance_list_borrowed_user.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').order_by('due_back')
