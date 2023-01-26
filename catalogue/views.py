@@ -1,9 +1,13 @@
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404
-from django.shortcuts import render
+import datetime
+
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404
+from django.urls import reverse
 from django.views import generic
 
+from catalogue.Form import RenewBookForm
 from catalogue.models import Book, BookInstance, Author, Genre
 
 
@@ -82,12 +86,59 @@ def author_detail_view(request, primary_key):
     return render(request, 'catalogue/author_detail.html', context={'author': author})
 
 
-
-class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
+class LoanedBooksByUserListView(LoginRequiredMixin,  generic.ListView):
     """Generic class-based view listing books on loan to current user."""
     model = BookInstance
     template_name = 'catalogue/bookinstance_list_borrowed_user.html'
     paginate_by = 10
 
+
+
     def get_queryset(self):
+        model = BookInstance
         return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').order_by('due_back')
+
+
+class LoanedBooksByLibrarianListView(LoginRequiredMixin, generic.ListView):
+    """Generic class-based view listing books on loan to current user."""
+    model = BookInstance
+    template_name = 'catalogue/bookinstance_list_borrowed_librarian.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return BookInstance.objects.filter(borrower=self.request.user.is_staff).filter(status__exact='o').order_by('due_back')
+
+
+@login_required
+@permission_required('catalog.can_mark_returned', raise_exception=True)
+def renew_book_librarian(request, pk):
+    """View function for renewing a specific BookInstance by librarian."""
+    book_instance = get_object_or_404(BookInstance, pk=pk)
+
+    # If this is a POST request then process the Form data
+    if request.method == 'POST':
+
+        # Create a form instance and populate it with data from the request (binding):
+        form = RenewBookForm(request.POST)
+
+        # Check if the form is valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
+            book_instance.due_back = form.cleaned_data['renewal_date']
+            book_instance.save()
+
+            # redirect to a new URL:
+            return HttpResponseRedirect(reverse('all-borrowed'))
+
+    # If this is a GET (or any other method) create the default form.
+    else:
+        proposed_renewal_date = datetime.date.today() + datetime.timedelta(weeks=3)
+        form = RenewBookForm(initial={'renewal_date': proposed_renewal_date})
+
+    context = {
+        'form': form,
+        'book_instance': book_instance,
+    }
+    return render(request, 'book_renew_librarian.html', context)
+
+
