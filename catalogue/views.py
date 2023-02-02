@@ -4,8 +4,9 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views import generic
+from django.views.generic import CreateView, UpdateView, DeleteView
 
 from catalogue.Form import RenewBookForm
 from catalogue.models import Book, BookInstance, Author, Genre
@@ -86,13 +87,11 @@ def author_detail_view(request, primary_key):
     return render(request, 'catalogue/author_detail.html', context={'author': author})
 
 
-class LoanedBooksByUserListView(LoginRequiredMixin,  generic.ListView):
+class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
     """Generic class-based view listing books on loan to current user."""
     model = BookInstance
     template_name = 'catalogue/bookinstance_list_borrowed_user.html'
     paginate_by = 10
-
-
 
     def get_queryset(self):
         model = BookInstance
@@ -106,7 +105,8 @@ class LoanedBooksByLibrarianListView(LoginRequiredMixin, generic.ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return BookInstance.objects.filter(borrower=self.request.user.is_staff).filter(status__exact='o').order_by('due_back')
+        return BookInstance.objects.filter(borrower=self.request.user.is_staff).filter(status__exact='o').order_by(
+            'due_back')
 
 
 @login_required
@@ -142,3 +142,35 @@ def renew_book_librarian(request, pk):
     return render(request, 'book_renew_librarian.html', context)
 
 
+class AuthorCreate(CreateView):
+    model = Author
+    fields = ['first_name', 'last_name', 'date_of_birth', 'date_of_death']
+    initial = {'date_of_death': '11/06/2020'}
+
+
+class AuthorUpdate(UpdateView):
+    model = Author
+    fields = '__all__'
+    # Not recommended (potential security issue if more fields added)
+
+
+class AuthorDelete(DeleteView):
+    model = Author
+    success_url = reverse_lazy('authors')
+
+
+class BookCreate(CreateView):
+    model = Book
+    fields = '__all__'
+    # initial = {'date_of_death': '11/06/2020'}
+
+
+class BookUpdate(UpdateView):
+    model = Book
+    fields = '__all__'
+    # Not recommended (potential security issue if more fields added)
+
+
+class BookDelete(DeleteView):
+    model = Book
+    success_url = reverse_lazy('books')
