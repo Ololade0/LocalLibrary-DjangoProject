@@ -35,7 +35,13 @@ import os
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'cg#p$g+j9tax!#a3cup@1$8obt2_+&k3q+pmu)5%asj6yjpkag')
-ALLOWED_HOSTS = []
+
+ALLOWED_HOSTS = ['web-production-3640.up.railway.app', '127.0.0.1']
+# CSRF_TRUSTED_ORIGINS = ['https://railway.app/project/acf03438-ab3a-443e-b0aa-f7449917831c/service/ad5cc0a5-1e98-4d7f'
+#                         '-bb73-c665a19ce0ff?id=b1ce6465-be24-44d0-96f3-00083d7f03e7']
+
+CSRF_TRUSTED_ORIGINS = ['https://*.railway.app']
+
 SECURE_HSTS_SECONDS = 31536000
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_HSTS_INCLUDE_SUBDOMAINS=True
