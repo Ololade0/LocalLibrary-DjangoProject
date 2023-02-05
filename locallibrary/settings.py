@@ -25,7 +25,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECRET_KEY = "cg#p$g+j9tax!#a3cup@1$8obt2_+&k3q+pmu)5%asj6yjpkag"
 import os
 
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'cg#p$g+j9tax!#a3cup@1$8obt2_+&k3q+pmu)5%asj6yjpkag')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = 'django-insecure-tsrs52bwkm3fq8*x5oux_*2laf+j&9(!_^63k1$^wc_(49k-$h'
@@ -34,6 +33,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'cg#p$g+j9tax!#a3cup@1$8obt2_+&
 # DEBUG = True
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'cg#p$g+j9tax!#a3cup@1$8obt2_+&k3q+pmu)5%asj6yjpkag')
 ALLOWED_HOSTS = []
 SECURE_HSTS_SECONDS = 31536000
 SECURE_CONTENT_TYPE_NOSNIFF = True
